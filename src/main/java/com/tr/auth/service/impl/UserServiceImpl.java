@@ -57,6 +57,24 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * 项目引入了 JWT，在实现退出功能的时候，发现即使调用了相关接口废弃令牌，但是令牌仍然可以使用。
+     *  查看原码才知道，使用的 JwtTokenStore 的 removeAccessToken 是个空方法。
+     *
+     * 查阅资料，其实要完美地失效JWT是没办法做到的。
+     *  “Actually, JWT serves a different purpose than a session and it is not possible to forcefully delete or invalidate an existing token.”
+     *                                                                                 ———— 实际上，JWT的作用与会话不同，不可能强制删除或使现有令牌无效。
+     * 有以下几个方法可以做到失效 JWT token：
+     *  1.将 token 存入 DB（如 Redis）中，失效则删除；但增加了一个每次校验时候都要先从 DB 中查询 token 是否存在的步骤，而且违背了 JWT 的无状态原则（这不就和 session 一样了么？）
+     *  2.维护一个 token 黑名单，失效则加入黑名单中
+     *  3.在 JWT 中增加一个版本号字段，失效则改变该版本号
+     *  4.在服务端设置加密的 key 时，为每个用户生成唯一的 key，失效则改变该 key
+     *
+     * 最后决定使用 Redis 建立一个白名单，大体思路如下：
+     *  1.生成 Jwt 的时候，将 Jwt Token 存入 redis 中
+     *  2.扩展 Jwt 的验证功能，验证 redis 中是否存在数据，如果存在则 token 有效，否则无效
+     *  3.实 现removeAccessToken 功能，在该方法内删除 redis 对应的 key
+     */
     @Override
     public boolean logout() {
         tokenStore.removeAccessToken(tokenStore.readAccessToken(JwtKit.getAuthorization()));

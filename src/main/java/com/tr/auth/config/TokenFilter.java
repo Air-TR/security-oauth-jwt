@@ -49,7 +49,7 @@ public class TokenFilter extends OncePerRequestFilter {
         }
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         Authentication auth = defaultTokenServices.loadAuthentication(token);
-//        SecurityContextHolder.getContext().setAuthentication(auth);
+        SecurityContextHolder.getContext().setAuthentication(auth);
         filterChain.doFilter(request, response);
     }
 
