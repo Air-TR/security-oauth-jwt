@@ -15,6 +15,10 @@ import java.util.Date;
 
 /**
  * @Author: TR
+ *
+ * refresh_token 使用：Postman 调用 /oauth/token 接口（TokenEndpoint 中）
+ *  1.Authorization 设置 Basic Auth，设置 client 的 username password
+ *  2.Body 设置 grant_type & refresh_token
  */
 @Api(tags = "用户中心")
 @RestController

@@ -1,6 +1,5 @@
 package com.tr.auth.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +18,7 @@ public class DefaultTokenServicesConfig {
     @Resource
     private TokenStore tokenStore; // TokenStoreConfig 中定义
 
-//    @Autowired
+//    @Resource
 //    private AuthenticationManager authenticationManager; // WebSecurityConfig 中定义
 
 //    @Resource

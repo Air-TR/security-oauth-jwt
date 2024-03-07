@@ -1,4 +1,4 @@
-package com.tr.auth.config;
+package com.tr.auth.kit;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

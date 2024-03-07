@@ -2,7 +2,7 @@ package com.tr.auth.service.impl;
 
 import com.google.common.collect.Maps;
 import com.tr.auth.config.CusAuthentication;
-import com.tr.auth.config.PasswordEncoderKit;
+import com.tr.auth.kit.PasswordEncoderKit;
 import com.tr.auth.entity.User;
 import com.tr.auth.kit.JwtKit;
 import com.tr.auth.repository.UserRepository;
