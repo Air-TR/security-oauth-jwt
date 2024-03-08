@@ -36,8 +36,8 @@ public class UserServiceImpl implements UserService {
     private TokenEndpoint tokenEndpoint;
     @Resource
     private TokenStore tokenStore;
-    @Resource
-    private DefaultTokenServices defaultTokenServices;
+//    @Resource
+//    private DefaultTokenServices defaultTokenServices;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean logout() {
-        defaultTokenServices.revokeToken(JwtKit.getAuthorization()); // 这一步其实没啥用，并不会从框架中 remove 掉 token，原来的 token 还能继续使用
+//        defaultTokenServices.revokeToken(JwtKit.getAuthorization()); // 这一步其实没啥用，并不会从框架中 remove 掉 token，原来的 token 还能继续使用
         return stringRedisTemplate.delete(RedisKey.TOKEN + JwtKit.getUsername());
     }
 

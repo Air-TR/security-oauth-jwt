@@ -45,8 +45,8 @@ public class TokenFilter extends OncePerRequestFilter {
         exPaths = Arrays.stream(securityExPath.split(",")).collect(Collectors.toList());
     }
 
-    @Resource
-    private DefaultTokenServices defaultTokenServices;
+//    @Resource
+//    private DefaultTokenServices defaultTokenServices;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -60,6 +60,7 @@ public class TokenFilter extends OncePerRequestFilter {
         }
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (!token.equals(stringRedisTemplate.opsForValue().get(RedisKey.TOKEN + JwtKit.getUsername(token)))) {
+            // 使用 redis 白名单方式，需要在 refresh token 时同步更新 redis token 白名单，否则新 token 会被 redis 拦截
             ServletKit.renderString(response, 401, "无效 token");
             return;
         }
