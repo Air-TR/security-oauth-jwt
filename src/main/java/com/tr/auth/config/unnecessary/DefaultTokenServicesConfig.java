@@ -1,4 +1,4 @@
-//package com.tr.auth.config;
+//package com.tr.auth.config.unnecessary;
 //
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
@@ -10,8 +10,6 @@
 //import javax.annotation.Resource;
 //
 ///**
-// * 这个类注掉没有影响，除了引入 DefaultTokenServices 的地方注释掉，refresh_token 还可以正常使用
-// *
 // * @Author: TR
 // */
 //@Configuration

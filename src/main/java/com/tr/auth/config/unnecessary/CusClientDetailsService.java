@@ -1,4 +1,4 @@
-//package com.tr.auth.config;
+//package com.tr.auth.config.unnecessary;
 //
 //import com.google.common.collect.Lists;
 //import com.google.common.collect.Sets;

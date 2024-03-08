@@ -1,8 +1,8 @@
 package com.tr.auth;
 
-import com.tr.auth.config.CusTokenEnhancer;
-import com.tr.auth.config.TokenFilter;
-import com.tr.auth.config.CusUserDetailsService;
+import com.tr.auth.config.cus.CusTokenEnhancer;
+import com.tr.auth.config.filter.TokenFilter;
+import com.tr.auth.config.cus.CusUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

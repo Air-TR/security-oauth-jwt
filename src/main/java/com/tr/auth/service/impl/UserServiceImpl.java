@@ -1,7 +1,7 @@
 package com.tr.auth.service.impl;
 
 import com.google.common.collect.Maps;
-import com.tr.auth.config.CusAuthentication;
+import com.tr.auth.config.cus.CusAuthentication;
 import com.tr.auth.constant.RedisKey;
 import com.tr.auth.kit.PasswordEncoderKit;
 import com.tr.auth.entity.User;
@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
@@ -34,8 +32,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Resource
     private TokenEndpoint tokenEndpoint;
-    @Resource
-    private TokenStore tokenStore;
+//    @Resource
+//    private TokenStore tokenStore;
 //    @Resource
 //    private DefaultTokenServices defaultTokenServices;
     @Resource
@@ -44,12 +42,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public OAuth2AccessToken login(String username, String password) {
         CusAuthentication cusAuthentication = new CusAuthentication();
-        cusAuthentication.setName("auth"); // 传 oauth_client_details 表的 client_id
+        cusAuthentication.setName("auth");
         cusAuthentication.setAuthenticated(true);
         Map<String, String> params = Maps.newLinkedHashMap();
         params.put("grant_type", "password");
         params.put("username", username);
         params.put("password", password);
+        try {
+            OAuth2AccessToken accessToken = tokenEndpoint.postAccessToken(cusAuthentication, params).getBody();
+            stringRedisTemplate.opsForValue().set(RedisKey.TOKEN + JwtKit.getUsername(accessToken.getValue()), accessToken.getValue(), tokenAliveTime, TimeUnit.SECONDS);
+            return accessToken;
+        } catch (HttpRequestMethodNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public OAuth2AccessToken refreshToken(String refreshToken) {
+        CusAuthentication cusAuthentication = new CusAuthentication();
+        cusAuthentication.setName("auth");
+        cusAuthentication.setAuthenticated(true);
+        Map<String, String> params = Maps.newLinkedHashMap();
+        params.put("grant_type", "refresh_token");
+        params.put("refresh_token", refreshToken);
         try {
             OAuth2AccessToken accessToken = tokenEndpoint.postAccessToken(cusAuthentication, params).getBody();
             stringRedisTemplate.opsForValue().set(RedisKey.TOKEN + JwtKit.getUsername(accessToken.getValue()), accessToken.getValue(), tokenAliveTime, TimeUnit.SECONDS);
@@ -83,7 +98,7 @@ public class UserServiceImpl implements UserService {
      * 最后决定使用 Redis 建立一个白名单，大体思路如下：
      *  1.生成 Jwt 的时候，将 Jwt Token 存入 redis 中
      *  2.扩展 Jwt 的验证功能，验证 redis 中是否存在数据，如果存在则 token 有效，否则无效
-     *  3.实 现removeAccessToken 功能，在该方法内删除 redis 对应的 key
+     *  3.实现 removeAccessToken 功能，在该方法内删除 redis 对应的 key
      */
     @Override
     public boolean logout() {

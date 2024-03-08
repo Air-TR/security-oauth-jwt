@@ -1,4 +1,4 @@
-package com.tr.auth.config;
+package com.tr.auth.config.cus;
 
 import com.tr.auth.entity.User;
 import com.tr.auth.service.UserRoleService;

@@ -1,4 +1,4 @@
-package com.tr.auth.config;
+package com.tr.auth.config.cus;
 
 import lombok.Data;
 import org.springframework.security.core.Authentication;

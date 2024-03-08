@@ -25,7 +25,7 @@ spring:
     timeout: 5000
 
 security:
-  ex-path: /swagger-resources/**,/swagger-ui.html,/v2/api-docs,/webjars/**,/user/register,/user/login,/user/logout,/oauth/token
+  ex-path: /swagger-resources/**,/swagger-ui.html,/v2/api-docs,/webjars/**,/user/register,/user/login,/user/refresh/token,/user/logout
 
 enable:
   security: true

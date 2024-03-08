@@ -1,4 +1,4 @@
-package com.tr.auth.config;
+package com.tr.auth.config.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.tr.auth.constant.RedisKey;

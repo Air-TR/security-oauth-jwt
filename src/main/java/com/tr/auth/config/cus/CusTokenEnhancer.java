@@ -1,4 +1,4 @@
-package com.tr.auth.config;
+package com.tr.auth.config.cus;
 
 import com.google.common.collect.Maps;
 import com.tr.auth.entity.User;
