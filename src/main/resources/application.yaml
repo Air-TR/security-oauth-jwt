@@ -1,12 +1,6 @@
 server:
   port: 9099
 
-security:
-  ex-path: /swagger-resources/**,/swagger-ui.html,/v2/api-docs,/webjars/**,/user/register,/user/login,/oauth/token
-
-enable:
-  security: true
-
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -29,3 +23,12 @@ spring:
     port: 6379
     password:
     timeout: 5000
+
+security:
+  ex-path: /swagger-resources/**,/swagger-ui.html,/v2/api-docs,/webjars/**,/user/register,/user/login,/user/logout,/oauth/token
+
+enable:
+  security: true
+
+token:
+  alive-time: 600

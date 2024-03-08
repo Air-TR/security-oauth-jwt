@@ -1,6 +1,7 @@
 package com.tr.auth.config;
 
 import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +42,9 @@ import java.util.List;
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
+    @Value("${token.alive-time}")
+    private Integer tokenAliveTime;
+
     @Resource
     private PasswordEncoder passwordEncoder;
     @Resource
@@ -70,7 +74,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .withClient("auth")
                 .secret(passwordEncoder.encode("123456")) // $2a$10$VVhz0JEm3uNQPxdx3vgdDuYgxe4e6X7SfNlewXfdtchirGUgfybTS —— 123456 对应的密文
                 .scopes("read","write") // all
-                .accessTokenValiditySeconds(3600)
+                .accessTokenValiditySeconds(tokenAliveTime)
                 .authorizedGrantTypes("password", "refresh_token");
 //                .autoApprove(true) //登录后绕过批准询问(/oauth/confirm_access)
 //                .refreshTokenValiditySeconds(36000);

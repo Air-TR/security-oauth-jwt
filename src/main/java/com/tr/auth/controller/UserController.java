@@ -4,6 +4,7 @@ import com.tr.auth.entity.User;
 import com.tr.auth.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +49,12 @@ public class UserController {
     @GetMapping("/user/test")
     public String test() {
         return "success " + new Date();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ROOT')")
+    @GetMapping("/user/test/role")
+    public String testRole() {
+        return "role success " + new Date();
     }
 
 }

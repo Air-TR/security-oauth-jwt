@@ -2,11 +2,14 @@ package com.tr.auth.service.impl;
 
 import com.google.common.collect.Maps;
 import com.tr.auth.config.CusAuthentication;
+import com.tr.auth.constant.RedisKey;
 import com.tr.auth.kit.PasswordEncoderKit;
 import com.tr.auth.entity.User;
 import com.tr.auth.kit.JwtKit;
 import com.tr.auth.repository.UserRepository;
 import com.tr.auth.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
@@ -16,12 +19,16 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: TR
  */
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Value("${token.alive-time}")
+    private Long tokenAliveTime;
 
     @Resource
     private UserRepository userRepository;
@@ -31,6 +38,8 @@ public class UserServiceImpl implements UserService {
     private TokenStore tokenStore;
     @Resource
     private DefaultTokenServices defaultTokenServices;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public OAuth2AccessToken login(String username, String password) {
@@ -43,6 +52,7 @@ public class UserServiceImpl implements UserService {
         params.put("password", password);
         try {
             OAuth2AccessToken accessToken = tokenEndpoint.postAccessToken(cusAuthentication, params).getBody();
+            stringRedisTemplate.opsForValue().set(RedisKey.TOKEN + JwtKit.getUsername(accessToken.getValue()), accessToken.getValue(), tokenAliveTime, TimeUnit.SECONDS);
             return accessToken;
         } catch (HttpRequestMethodNotSupportedException e) {
             throw new RuntimeException(e);
@@ -77,8 +87,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean logout() {
-        tokenStore.removeAccessToken(tokenStore.readAccessToken(JwtKit.getAuthorization()));
-        return defaultTokenServices.revokeToken(JwtKit.getAuthorization());
+        defaultTokenServices.revokeToken(JwtKit.getAuthorization()); // 这一步其实没啥用，并不会从框架中 remove 掉 token，原来的 token 还能继续使用
+        return stringRedisTemplate.delete(RedisKey.TOKEN + JwtKit.getUsername());
     }
 
     @Override

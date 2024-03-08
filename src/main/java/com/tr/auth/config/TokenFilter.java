@@ -1,9 +1,18 @@
 package com.tr.auth.config;
 
+import com.alibaba.fastjson.JSON;
+import com.tr.auth.constant.RedisKey;
+import com.tr.auth.kit.JwtKit;
+import com.tr.auth.kit.ServletKit;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -38,6 +47,8 @@ public class TokenFilter extends OncePerRequestFilter {
 
     @Resource
     private DefaultTokenServices defaultTokenServices;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -48,8 +59,21 @@ public class TokenFilter extends OncePerRequestFilter {
             }
         }
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Authentication auth = defaultTokenServices.loadAuthentication(token);
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        if (!token.equals(stringRedisTemplate.opsForValue().get(RedisKey.TOKEN + JwtKit.getUsername(token)))) {
+            ServletKit.renderString(response, 401, "无效 token");
+            return;
+        }
+        // 方式一（没有解决赋予 authorities 问题，用不了 @PreAuthorize、@RolesAllowed、@Secured 注解）
+//        try {
+//            OAuth2Authentication authentication = defaultTokenServices.loadAuthentication(token); // 会验证 token 是否过期，但是上一步 redis 判断已经拦截了过期的 token
+//        } catch (AuthenticationException | InvalidTokenException e) {
+//            ServletKit.renderString(response, 401, e.getMessage());
+//            return;
+//        }
+        // 方式二（可以赋予 authorities）
+        List<SimpleGrantedAuthority> authorities = JSON.parseArray(JwtKit.getAuthorities().toString(), SimpleGrantedAuthority.class);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(token, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
     }
 

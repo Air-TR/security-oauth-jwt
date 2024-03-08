@@ -13,20 +13,17 @@ import java.io.Serializable;
 /**
  * @Author: TR
  */
-@ApiModel(value = "用户")
+@ApiModel(value = "权限")
 @Data
 @Entity
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
-public class User extends BaseEntity implements Serializable {
+public class Role extends BaseEntity implements Serializable {
 
-    @ApiModelProperty(value = "用户名")
+    @ApiModelProperty(value = "角色名称")
     @Column(nullable = false, unique = true)
-    private String username;
-    @ApiModelProperty(value = "密码")
+    private String rolename;
+    @ApiModelProperty(value = "描述")
     @Column(nullable = false)
-    private String password;
-    @ApiModelProperty(value = "手机号")
-    @Column(unique = true)
-    private String phone;
+    private String description;
 
 }

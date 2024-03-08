@@ -21,7 +21,8 @@ public class JwtKit {
      * 返回 token，不带授权类型（如 bearer）
      */
     public static String getToken() {
-        return getAuthorization().split(" ")[1];
+//        return getAuthorization().split(" ")[1];
+        return getAuthorization();
     }
 
     /**
